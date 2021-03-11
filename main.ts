@@ -68,6 +68,7 @@ function enemy_death (enemy: Sprite) {
     }
 }
 statusbars.onZero(StatusBarKind.EnemyHealth, function (status) {
+    info.changeScoreBy(1)
     enemy_death(status.spriteAttachedTo())
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.powerup, function (sprite, otherSprite) {
@@ -108,7 +109,6 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
         game.over(false)
     }
 })
-let spawn = 0
 let statusbar: StatusBarSprite = null
 let boomboom: Sprite = null
 let power_up: Sprite = null
@@ -268,7 +268,17 @@ statusbar2.setColor(7, 2)
 statusbar2.positionDirection(CollisionDirection.Top)
 statusbar2.setBarBorder(1, 15)
 statusbar2.setLabel("HP")
-let speed = 20
+let speed = 10
+let spawn = 5000
+if (info.score() == 50) {
+    game.over(true, effects.confetti)
+}
+game.onUpdateInterval(2000, function () {
+    speed += 5
+    speed = Math.min(speed, 50)
+    spawn += -50
+    spawn = Math.max(spawn, 500)
+})
 forever(function () {
     boomboom = sprites.create(img`
         . . . . . . . . . . . . . . . . 
@@ -294,10 +304,4 @@ forever(function () {
     statusbar = statusbars.create(15, 2, StatusBarKind.EnemyHealth)
     statusbar.attachToSprite(boomboom)
     pause(spawn)
-})
-game.onUpdateInterval(500, function () {
-    speed += 5
-    speed = Math.min(speed, 50)
-    spawn += -50
-    spawn = Math.max(spawn, 500)
 })
